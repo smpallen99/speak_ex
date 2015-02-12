@@ -12,7 +12,7 @@ defmodule SpeakEx.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :erlagi]]
   end
 
   # Dependencies can be Hex packages:
@@ -25,6 +25,8 @@ defmodule SpeakEx.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [
+      {:erlagi, github: "knewter/erlagi", branch: "feature/rebar3"},
+    ]
   end
 end
