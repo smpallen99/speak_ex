@@ -1,0 +1,3 @@
+%{"erlagi": {:git, "git://github.com/smpallen99/erlagi.git", "59ff096dfdb2acaf8a713bf6bdeaa3021d267b3f", [branch: "feature/rebar3"]},
+  "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "71e63212f12c25827e0c1b4198d37d5d018a7fec", [tag: "0.1.6"]},
+  "lager": {:git, "git://github.com/basho/lager.git", "d33ccf3b69de09a628fe38b4d7981bb8671b8a4f", [ref: "master"]}}

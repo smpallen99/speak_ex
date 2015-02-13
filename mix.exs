@@ -26,7 +26,7 @@ defmodule SpeakEx.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:erlagi, github: "knewter/erlagi", branch: "feature/rebar3"},
+      {:erlagi, github: "smpallen99/erlagi", branch: "feature/rebar3"},
     ]
   end
 end
