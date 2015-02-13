@@ -1,8 +1,8 @@
-defmodule ExComm.CallController do
+defmodule SpeakEx.CallController do
   require Logger
-  alias ExComm.AgiResult
-  import ExComm.Utils
-  use ExComm.CallController.Macros
+  alias SpeakEx.AgiResult
+  import SpeakEx.Utils
+  use SpeakEx.CallController.Macros
 
   defmacro __using__(_options) do
     quote do
@@ -18,7 +18,7 @@ defmodule ExComm.CallController do
     Agent.start_link(fn -> 
       opts = Keyword.drop(options, [:controller_metadata, :controller])
       |> Keyword.put(:caller_pid, self)
-      ExComm.originate(to, opts)
+      SpeakEx.OutboundCall.originate(to, opts)
       {{module, controller}, metadata} 
     end) 
   end

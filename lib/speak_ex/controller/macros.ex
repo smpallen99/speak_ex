@@ -1,5 +1,5 @@
-defmodule ExComm.CallController.Macros do
- # import ExComm.Utils
+defmodule SpeakEx.CallController.Macros do
+ # import SpeakEx.Utils
 
   defmacro __using__(_options) do
     quote do
