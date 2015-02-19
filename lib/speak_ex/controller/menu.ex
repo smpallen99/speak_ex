@@ -18,7 +18,7 @@ defmodule SpeakEx.CallController.Menu do
       var!(__matches) = []
       unquote(block)
       commands = %{matches: var!(__matches), invalid: var!(__invalid), timeout: var!(__timeout), failure: var!(__failure)}
-      SpeakEx.CallController.Menu.__menu(unquote(call), unquote(prompt), unquote(options), commands, 0)
+      SpeakEx.CallController.Menu.__menu(unquote(call), unquote(prompt), unquote(options), commands, 1)
     end
   end
   
@@ -94,6 +94,8 @@ defmodule SpeakEx.CallController.Menu do
     rescue 
       all -> 
         Logger.debug "Exception: #{inspect all}"
+        failure = commands[:failure]
+        if failure, do: failure.()
     end
   end
 end
