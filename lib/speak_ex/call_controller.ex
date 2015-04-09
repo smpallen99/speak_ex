@@ -69,10 +69,8 @@ defmodule SpeakEx.CallController do
   # Callbacks 
 
   def new_call(call) do
-    variable = :erlagi.get_variable(call, 'caller_pid')
-    Logger.debug "caller_pid: #{inspect variable}"
+    agent = :erlagi.get_variable(call, 'caller_pid') |> :erlang.list_to_pid 
 
-    agent = variable |> :erlang.list_to_pid 
     case Agent.get(agent, &(&1)) do
       {{mod, fun}, metadata} ->
         Agent.stop(agent)
@@ -88,7 +86,7 @@ defmodule SpeakEx.CallController do
 
   def run_command(module, function, arguments) do
     result = :erlang.apply(module, function, arguments)
-    Logger.debug "Result ==> #{inspect result}"
+    Logger.debug "#{__MODULE__}: run_command result - #{inspect result}"
     AgiResult.new result
   end
 

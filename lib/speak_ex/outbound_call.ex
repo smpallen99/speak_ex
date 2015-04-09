@@ -5,7 +5,7 @@ defmodule SpeakEx.OutboundCall do
   @redirect_number  "1"
 
   def originate(channel, extension, context, priority, variables \\ [], callback \\ nil) do
-    ExAmi.Client.Originate.dial(:asterisk, channel, {context, extension, priority}, variables, callback) 
+    ExAmi.Client.Originate.dial(:asterisk, channel, {context, extension, priority}, variables, callback, []) 
   end
   
   def originate(to, options \\ []) do
@@ -16,8 +16,10 @@ defmodule SpeakEx.OutboundCall do
     callback = get_setting(options, :callback, nil)
     caller_pid_var = Keyword.get(options, :caller_pid, self) |> get_caller_pid_var
 
+    opts = Keyword.drop options, [:event_handler, :context, :priority, :exten, :callback, :caller_pid]
+
     ExAmi.Client.Originate.dial(:asterisk, to, {context, exten, priority}, 
-      [caller_pid_var], callback)
+      [caller_pid_var], callback, opts)
   end
 
   defp get_caller_pid_var(pid) do
