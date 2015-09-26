@@ -2,6 +2,7 @@ defmodule SpeakEx.CallController do
   require Logger
   alias SpeakEx.AgiResult
   import SpeakEx.Utils
+  alias SpeakEx.Output
   use SpeakEx.CallController.Macros
 
   defmacro __using__(_options) do
@@ -51,6 +52,8 @@ defmodule SpeakEx.CallController do
   api :stop_play_tones
   api :record
   api :dial
+  api :exec
+  api :swift
 
   #api :play, :stream_file
 
@@ -64,20 +67,47 @@ defmodule SpeakEx.CallController do
     play(call, filename_or_list)
     call
   end
+  
+  def speak(call, phrase), do: Output.render(call, phrase)
+  def speak!(call, phrase) do
+    speak(call, phrase)
+    call
+  end
+  def say(call, phrase), do: speak(call, phrase)
+  def say!(call, phrase), do: speak!(call, phrase)
+
+  def swift_send(call, phrase) do
+    exec(call, ['SWIFT', [phrase]])
+  end
+
+  def get_variable(call, variable) when is_binary(variable),
+    do: get_variable(call, String.to_char_list(variable))
+  def get_variable(call, variable) do
+    call 
+    |> :erlagi_io.agi_rw('GET VARIABLE', [variable])
+    |> :erlagi_result.get_variable()
+  end
 
   #######################
   # Callbacks 
 
   def new_call(call) do
-    agent = :erlagi.get_variable(call, 'caller_pid') |> :erlang.list_to_pid 
+    caller_pid = :erlagi.get_variable(call, 'caller_pid') 
+      
+    unless caller_pid do
+      Application.get_env(:speak_ex, :router)
+      |> apply(:do_router, [call])
+    else
+      agent = caller_pid |> :erlang.list_to_pid 
 
-    case Agent.get(agent, &(&1)) do
-      {{mod, fun}, metadata} ->
-        Agent.stop(agent)
-        apply(mod, fun, [call, metadata])
-      other -> 
-        Logger.error "Failed to get from Agent. Result was #{inspect other}"
-        {:error, "Agent failed. Result was #{inspect other}"}
+      case Agent.get(agent, &(&1)) do
+        {{mod, fun}, metadata} ->
+          Agent.stop(agent)
+          apply(mod, fun, [call, metadata])
+        other -> 
+          Logger.error "Failed to get from Agent. Result was #{inspect other}"
+          {:error, "Agent failed. Result was #{inspect other}"}
+      end
     end
   end
 
@@ -86,7 +116,6 @@ defmodule SpeakEx.CallController do
 
   def run_command(module, function, arguments) do
     result = :erlang.apply(module, function, arguments)
-    Logger.debug "#{__MODULE__}: run_command result - #{inspect result}"
     AgiResult.new result
   end
 

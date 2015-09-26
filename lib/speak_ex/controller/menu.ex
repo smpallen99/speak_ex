@@ -3,9 +3,12 @@ defmodule SpeakEx.CallController.Menu do
   alias SpeakEx.AgiResult
   require Logger
   import SpeakEx.CallController
+  import SpeakEx.Output
+  alias SpeakEx.CallController.Menu
 
   defmacro __using__(_options) do
     quote do
+      alias SpeakEx.CallController.Menu
       import unquote(__MODULE__)
     end
   end 
@@ -18,7 +21,7 @@ defmodule SpeakEx.CallController.Menu do
       var!(__matches) = []
       unquote(block)
       commands = %{matches: var!(__matches), invalid: var!(__invalid), timeout: var!(__timeout), failure: var!(__failure)}
-      SpeakEx.CallController.Menu.__menu(unquote(call), unquote(prompt), unquote(options), commands, 1)
+      Menu.__menu(unquote(call), unquote(prompt), unquote(options), commands, 1)
     end
   end
   
@@ -60,42 +63,53 @@ defmodule SpeakEx.CallController.Menu do
       timeout = Keyword.get(options, :timeout, '-1')
       |> any_to_char_list
 
-      press = case stream_file(call, [prompt, '#*1234567890']) do
-        %AgiResult{data: [0]} -> 
+      press = 
+      case render(call, prompt, num_digits: 1, digits: '#*1234567890', timeout: timeout) do
+        %AgiResult{timeout: true} = res -> 
           # The user has let the prompt play to completion
           case run_command(:erlagi, :wait_digit, [call, timeout]) do
             %AgiResult{timeout: false, data: data} -> data
             %AgiResult{timeout: true} -> :timeout
           end
-        %AgiResult{data: data} -> 
+        %AgiResult{data: data} = res -> 
           # The user has interrupted the playback
           data
       end
 
-      Logger.debug "__menu - press: #{press}"
-
       if press == :timeout do
         timeout = commands[:timeout]
         if timeout, do: timeout.()
-        unless SpeakEx.CallController.Menu.__check_and_handle_failure(call, tries, count, commands), do: 
-          SpeakEx.CallController.Menu.__menu(call, prompt, options, commands, count + 1)
+        unless Menu.__check_and_handle_failure(call, tries, count, commands), 
+          do: Menu.__menu(call, prompt, options, commands, count + 1)
       else
-        case Enum.find commands[:matches], &(elem(&1,0) == press) do
+        case Enum.find commands[:matches], &(__press_valid?(&1, press)) do
           nil -> 
             invalid = commands[:invalid]
             if invalid, do: invalid.(press)
-            unless SpeakEx.CallController.Menu.__check_and_handle_failure(call, tries, count, commands), do: 
-              SpeakEx.CallController.Menu.__menu(call, prompt, options, commands, count + 1)
+            unless Menu.__check_and_handle_failure(call, tries, count, commands), do: 
+              Menu.__menu(call, prompt, options, commands, count + 1)
           {_value, fun} -> 
-            if fun, do: fun.()
-            :ok
+            cond do
+              is_function(fun, 0) -> fun.()
+              is_function(fun, 1) -> fun.(press)
+              true -> :ok
+            end
         end
       end
     rescue 
       all -> 
-        Logger.debug "Exception: #{inspect all}"
         failure = commands[:failure]
         if failure, do: failure.()
     end
   end
+  def __press_valid?(match, press) when is_binary(press) do
+    __press_valid?(match, String.to_integer(press) + ?0)
+  end
+  def __press_valid?(match, [press | _]) do
+    __press_valid? match, press
+  end
+  def __press_valid?(match, press) do
+    press in elem(match, 0)
+  end
+
 end

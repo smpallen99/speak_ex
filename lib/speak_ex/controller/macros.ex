@@ -31,7 +31,9 @@ defmodule SpeakEx.CallController.Macros do
   defp _api(name, command_name) do
     fun2 = String.to_atom("#{name}!")
     quote do
-      def unquote(name)(call, opts \\ []), do: command(unquote(name), [call] ++ opts)
+      def unquote(name)(call), do: command(unquote(command_name), [call])
+      def unquote(name)(call, opts) when is_list(opts), do: command(unquote(command_name), [call] ++ opts)
+      def unquote(name)(call, arg), do: command(unquote(command_name), [call] ++ [arg])
       def unquote(fun2)(call, opts \\ []) do
         unquote(name)(call, opts)
         call

@@ -17,6 +17,12 @@ use Mix.Config
 #       format: "$date $time [$level] $metadata$message\n",
 #       metadata: [:user_id]
 
+config :erlagi,
+  listen: [
+    {:localhost, host: '127.0.0.1', port: 20000, backlog: 5, callback: SpeakEx.CallController}
+  ]
+
+
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
 # by uncommenting the line below and defining dev.exs, test.exs and such.
