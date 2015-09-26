@@ -68,13 +68,13 @@ defmodule SpeakEx.CallController do
     call
   end
   
-  def speak(call, phrase), do: Output.render(call, phrase)
-  def speak!(call, phrase) do
-    speak(call, phrase)
+  def speak(call, phrase, opts \\ []), do: Output.render(call, phrase, opts)
+  def speak!(call, phrase, opts \\ []) do
+    speak(call, phrase, opts)
     call
   end
-  def say(call, phrase), do: speak(call, phrase)
-  def say!(call, phrase), do: speak!(call, phrase)
+  def say(call, phrase, opts \\ []), do: speak(call, phrase, opts)
+  def say!(call, phrase, opts \\ []), do: speak!(call, phrase, opts)
 
   def swift_send(call, phrase) do
     exec(call, ['SWIFT', [phrase]])

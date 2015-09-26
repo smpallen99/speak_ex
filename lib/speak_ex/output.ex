@@ -6,9 +6,16 @@ defmodule SpeakEx.Output do
 
   def render(call, phrase, opts \\ []) 
   def render(call, phrase, opts) do
-    timeout = Keyword.get opts, :timeout, nil
-    digits = Keyword.get opts, :digits, nil
+    if Keyword.get opts, :interrupt, :false do
+      timeout = 1
+      digits = '#'
+    else
+      timeout = Keyword.get opts, :timeout, nil
+      digits = Keyword.get opts, :digits, nil
+    end
+    
     voice =  Keyword.get opts, :voice, nil
+
     num_digits = if digits,
       do: 1, 
       else: Keyword.get(opts, :num_digits, nil)
