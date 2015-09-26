@@ -1,7 +1,7 @@
 defmodule SpeakEx.Output do
   alias SpeakEx.CallController, as: Api
   require Logger
-  import SpeakEx.Output.Swift
+  alias SpeakEx.Output.Swift
 
 
   def render(call, phrase, opts \\ []) 
@@ -13,7 +13,7 @@ defmodule SpeakEx.Output do
       timeout = Keyword.get opts, :timeout, nil
       digits = Keyword.get opts, :digits, nil
     end
-    
+
     voice =  Keyword.get opts, :voice, nil
 
     num_digits = if digits,
@@ -26,7 +26,7 @@ defmodule SpeakEx.Output do
       :swift -> 
         case phrase do
           'file://' ++ filename -> 
-            asterisk_stream_file(call, phrase, timeout, digits, voice)
+            asterisk_stream_file(call, filename, timeout, digits, voice)
           _ -> 
             swift_stream_file(call, phrase, timeout, num_digits, voice)
         end
@@ -37,7 +37,7 @@ defmodule SpeakEx.Output do
 
   defp swift_stream_file(call, [phrase | _] = list, timeout, digits, voice) when not is_integer(phrase) do
     text = Enum.reduce(list, "", fn(item, acc) -> 
-      separator = if acc == "", do: "", else: " <break strength='medium' /> "
+      separator = if acc == "", do: "", else: Swift.ssml[:break][:sentence]
       acc <> separator <> "#{item}"
     end)
     |> String.to_char_list
@@ -78,7 +78,7 @@ defmodule SpeakEx.Output do
     end
   end
 
-  defp asterisk_stream_file(call, prompt, timeout, digits, voice) do
+  defp asterisk_stream_file(call, prompt, _timeout, digits, voice) do
 
     if voice, do: throw("voice not valid for asterisk")
 

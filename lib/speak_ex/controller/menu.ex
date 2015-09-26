@@ -68,6 +68,7 @@ defmodule SpeakEx.CallController.Menu do
       |> handle_matches(call, prompt, options, commands, count, tries) 
     rescue 
       all -> 
+        Logger.error "Exception: #{inspect all}"
         commands[:failure]
         |> handle_callback(:failure, :ok)
         |> handle_call_back_response(call, prompt, options, commands, count, tries)
@@ -76,13 +77,13 @@ defmodule SpeakEx.CallController.Menu do
 
   defp get_response(call, prompt, timeout) do
     case render(call, prompt, num_digits: 1, digits: '#*1234567890', timeout: timeout) do
-      %AgiResult{timeout: true} = res -> 
+      %AgiResult{timeout: true} -> 
         # The user has let the prompt play to completion
         case run_command(:erlagi, :wait_digit, [call, timeout]) do
           %AgiResult{timeout: false, data: data} -> data
           %AgiResult{timeout: true} -> :timeout
         end
-      %AgiResult{data: data} = res -> 
+      %AgiResult{data: data} -> 
         # The user has interrupted the playback
         data
     end
@@ -91,15 +92,15 @@ defmodule SpeakEx.CallController.Menu do
   defp handle_timeout(:timeout, call, prompt, options, commands, count, tries) do
     fun = commands[:timeout]
     if fun, do: fun.()
-    unless Menu.check_and_handle_failure(call, tries, count, commands), 
-      do: Menu.do_menu(call, prompt, options, commands, count + 1)
+    unless check_and_handle_failure(call, tries, count, commands), 
+      do: do_menu(call, prompt, options, commands, count + 1)
     :timeout
   end
-  defp handle_timeout(press, call, prompt, options, commands, count, tries) do
+  defp handle_timeout(press, _call, _prompt, _options, _commands, _count, _tries) do
     press
   end
 
-  defp handle_matches(:timeout, call, prompt, options, commands, count, tries) do
+  defp handle_matches(:timeout, _call, _prompt, _options, _commands, _count, _tries) do
     :timeout
   end
   defp handle_matches(press, call, prompt, options, commands, count, tries) do
@@ -115,10 +116,10 @@ defmodule SpeakEx.CallController.Menu do
     end
   end
 
-  defp check_and_handle_failure(call, tries, count, commands) do
+  defp check_and_handle_failure(_call, tries, count, commands) do
     if (tries != :infinite) and (count >= tries) do
-      failure = commands[:failure]
-      if failure, do: failure.()
+      fun = commands[:failure]
+      if fun, do: fun.()
       true
     end
   end
@@ -134,13 +135,13 @@ defmodule SpeakEx.CallController.Menu do
   defp handle_call_back_response(resp, call, prompt, options, commands, count, tries) do
     case resp do
       :invalid -> 
-        unless Menu.check_and_handle_failure(call, tries, count, commands) do 
+        unless check_and_handle_failure(call, tries, count, commands) do 
           Menu.do_menu(call, prompt, options, commands, count + 1)
         else 
           :ok
         end
       :repeat -> 
-        Menu.do_menu(call, prompt, options, commands, count)
+        do_menu(call, prompt, options, commands, count)
       other -> 
         other
     end

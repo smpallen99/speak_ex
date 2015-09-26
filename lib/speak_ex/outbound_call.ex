@@ -1,6 +1,5 @@
 defmodule SpeakEx.OutboundCall do
   require Logger
-  import SpeakEx.Utils
 
   @redirect_number  "1"
 
@@ -9,7 +8,7 @@ defmodule SpeakEx.OutboundCall do
   end
   
   def originate(to, options \\ []) do
-    event_handler = Keyword.get(options, :event_handler, nil)
+    # event_handler = Keyword.get(options, :event_handler, nil)
     context = get_setting(options, :context, "from-internal")
     priority = get_setting(options, :priority, "1")
     exten = get_setting(options, :exten, @redirect_number)

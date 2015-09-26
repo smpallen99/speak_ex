@@ -13,7 +13,7 @@ defmodule SpeakEx.Output.Swift do
   @rate_x_fast          " <prosody rate='x-fast'> "
   @rate_default         " <prosody rate='default'> "
 
-  def swift, do: [
+  def ssml, do: [
     break: [
       x_weak:           @break_x_weak,
       weak:             @break_weak,

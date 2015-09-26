@@ -1,6 +1,6 @@
 defmodule SpeakEx.Router do
 
-  defmacro __using__(opts \\ []) do
+  defmacro __using__(_opts \\ []) do
     quote do 
       import unquote(__MODULE__)
     end
@@ -28,7 +28,7 @@ defmodule SpeakEx.Router do
     end
   end
 
-  def run_route(call, {name, module, opts}, nil) do
+  def run_route(call, {_name, module, opts}, nil) do
     result = Enum.all?(opts, fn({k,v}) -> 
       new_key = SpeakEx.Utils.translate_channel_variable k
       SpeakEx.Utils.get_channel_variable(call, new_key) == v
@@ -39,6 +39,6 @@ defmodule SpeakEx.Router do
       nil
     end
   end
-  def run_route(call, route, result), do: result
-  
+  def run_route(_call, _route, result), do: result
+
 end

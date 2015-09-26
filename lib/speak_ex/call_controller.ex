@@ -1,7 +1,6 @@
 defmodule SpeakEx.CallController do
   require Logger
   alias SpeakEx.AgiResult
-  import SpeakEx.Utils
   alias SpeakEx.Output
   use SpeakEx.CallController.Macros
 
