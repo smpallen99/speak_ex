@@ -1,11 +1,26 @@
 defmodule SpeakEx.CallController.Menu do
+
+  @moduledoc """
+  Defines a voice menu.
+
+  A menu provides a way to play voice prompts to a user and DTMF input
+  from the user. For example:
+
+      menu "Press 1 for yes, or 2 for no", timeout: 3000, tries: 3 do
+        match '1', fn -> say "You answered yes" end
+        match '2', fn -> say "You answered no" end
+        invalid fn(press) -> say "is invalid" end
+        timeout fn -> say "times up, try again" end
+      end
+  
+  """
   import SpeakEx.Utils
   alias SpeakEx.AgiResult
   require Logger
   import SpeakEx.CallController
   import SpeakEx.Output
   alias SpeakEx.CallController.Menu
-
+  
   defmacro __using__(_options) do
     quote do
       alias SpeakEx.CallController.Menu
