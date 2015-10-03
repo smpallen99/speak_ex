@@ -23,6 +23,11 @@ config/config.exs
         {:secret, "secret"}
       ]} ]
   ```
+
+More documentation is coming soon. 
+
+For a brief tutorial, please visit [Elixir Survey Tutorial](https://github.com/smpallen99/elixir_survey_tutorial)
+
 ## License
 
 `speak_ex` is Copyright (c) 2015 E-MetroTel
