@@ -20,8 +20,8 @@ defmodule SpeakEx.Mixfile do
 
   defp deps do
     [
-      {:erlagi, github: "smpallen99/erlagi", branch: "feature/rebar3"},
-      {:ex_ami, github: "smpallen99/ex_ami"},
+      {:erlagi, github: "smpallen99/erlagi"},
+      {:ex_ami, "~> 0.1"},
     ]
   end
 
