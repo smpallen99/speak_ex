@@ -19,7 +19,7 @@ exten => _5XXX,1,Noop(SpeakEx Demo)
 exten => _5XXX,n,AGI(agi://10.1.2.209:20000)
 ```
 
-Configure an account for AMI. 
+Configure an account for AMI.
 
 /etc/asterisk/manager.conf
 ```
@@ -41,14 +41,14 @@ Reload asterisk with `asterisk -rx reload`
 mix.exs
 ```elixir
       ...
-      {:speak_ex, github: "smpallen99/speak_ex"},
+      {:speak_ex, "~> 0.3"},
       ...
 ```
 
 Fetch and compile the dependency:
 
 ```
-mix do deps.get, deps.compile 
+mix do deps.get, deps.compile
 ```
 
 #### Configure AGI and AMI in your elixir project
@@ -59,11 +59,11 @@ config/config.exs
 ```elixir
   config :erlagi,
     listen: [
-      {:localhost, host: '127.0.0.1', port: 20000, backlog: 5, 
+      {:localhost, host: '127.0.0.1', port: 20000, backlog: 5,
           callback: SpeakEx.CallController}
     ]
 
-  config :ex_ami, 
+  config :ex_ami,
     servers: [
       {:asterisk, [
         {:connection, {ExAmi.TcpConnection, [
@@ -92,7 +92,7 @@ lib/call_router.ex
 defmodule Survey.CallRouter do
   use SpeakEx.Router
 
-  router do 
+  router do
     route "Survey", MyProject.CallController # , to: ~r/5555/
   end
 end
@@ -117,11 +117,11 @@ defmodule MyProject.CallController do
 end
 ```
 
-More documentation is coming soon. 
+More documentation is coming soon.
 
 ## License
 
-`speak_ex` is Copyright (c) 2015 E-MetroTel
+`speak_ex` is Copyright (c) 2015-2016 E-MetroTel
 
 The source code is released under the MIT License.
 

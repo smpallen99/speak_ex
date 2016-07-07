@@ -4,39 +4,36 @@ defmodule SpeakEx.Output do
   alias SpeakEx.Output.Swift
 
 
-  def render(call, phrase, opts \\ []) 
+  def render(call, phrase, opts \\ [])
   def render(call, phrase, opts) do
-    if Keyword.get opts, :interrupt, :false do
-      timeout = 1
-      digits = '#'
-    else
-      timeout = Keyword.get opts, :timeout, nil
-      digits = Keyword.get opts, :digits, nil
-    end
+    {timeout, digits} =
+      if Keyword.get opts, :interrupt, :false do
+        {1, '#'}
+      else
+        {Keyword.get(opts, :timeout, nil), Keyword.get(opts, :digits, nil)}
+      end
 
     voice =  Keyword.get opts, :voice, nil
 
-    num_digits = if digits,
-      do: 1, 
-      else: Keyword.get(opts, :num_digits, nil)
+    num_digits = if digits, do: 1, else: Keyword.get(opts, :num_digits, nil)
 
     case Application.get_env(:speak_ex, :renderer, :asterisk) do
-      :asterisk -> 
+      :asterisk ->
         asterisk_stream_file(call, phrase, timeout, digits, voice)
-      :swift -> 
+      :swift ->
         case phrase do
-          'file://' ++ filename -> 
+          'file://' ++ filename ->
             asterisk_stream_file(call, filename, timeout, digits, voice)
-          _ -> 
+          _ ->
             swift_stream_file(call, phrase, timeout, num_digits, voice)
         end
-      other -> 
+      other ->
         throw "Unknown speak_ex renderer #{other}"
-    end 
+    end
   end
 
   defp swift_stream_file(call, [phrase | _] = list, timeout, digits, voice) when not is_integer(phrase) do
-    text = Enum.reduce(list, "", fn(item, acc) -> 
+    text = Enum.reduce(list, "", fn(item, acc) ->
       separator = if acc == "", do: "", else: Swift.ssml[:break][:sentence]
       acc <> separator <> "#{item}"
     end)
@@ -59,18 +56,18 @@ defmodule SpeakEx.Output do
     prepend = unless is_nil(voice), do: '#{voice}^', else: ''
     text = prepend ++ phrase ++ append
 
-    result = call 
+    result = call
     |> Api.swift_send(text)
-    |> SpeakEx.AgiResult.new 
+    |> SpeakEx.AgiResult.new
 
     unless append == '' do
       case Api.get_variable(call, 'SWIFT_DTMF') do
-        '' -> 
+        '' ->
           %SpeakEx.AgiResult{result | timeout: true}
-        resp when is_list(resp) -> 
+        resp when is_list(resp) ->
           data = List.to_string resp
           %SpeakEx.AgiResult{result | timeout: false, data: data}
-        other -> 
+        other ->
           %SpeakEx.AgiResult{result | result: other, timeout: true}
       end
     else
@@ -83,7 +80,7 @@ defmodule SpeakEx.Output do
     if voice, do: throw("voice not valid for asterisk")
 
     args = if digits, do: [digits], else: []
-    Api.stream_file(call, [prompt | args]) 
+    Api.stream_file(call, [prompt | args])
   end
 
 end

@@ -2,10 +2,16 @@ defmodule SpeakEx.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :speak_ex,
-     version: "0.2.0",
-     elixir: "~> 1.0.0",
-     deps: deps]
+    [
+      app: :speak_ex,
+      version: "0.3.0",
+      elixir: "~> 1.3",
+      deps: deps,
+      package: package,
+      name: "Coherence",
+      description: """
+      An Elixir framework for building telephony applications, inspired by Ruby's Adhearsion.
+      """]
   end
 
   def application do
@@ -15,7 +21,14 @@ defmodule SpeakEx.Mixfile do
   defp deps do
     [
       {:erlagi, github: "smpallen99/erlagi", branch: "feature/rebar3"},
-      {:ex_ami, github: "smpallen99/ex_ami"}, 
+      {:ex_ami, github: "smpallen99/ex_ami"},
     ]
+  end
+
+  defp package do
+    [ maintainers: ["Stephen Pallen"],
+      licenses: ["MIT"],
+      links: %{ "Github" => "https://github.com/smpallen99/speak_ex"},
+      files: ~w(lib README.md mix.exs LICENSE)]
   end
 end
