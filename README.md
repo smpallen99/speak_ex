@@ -41,7 +41,7 @@ Reload asterisk with `asterisk -rx reload`
 mix.exs
 ```elixir
       ...
-      {:speak_ex, "~> 0.3"},
+      {:speak_ex, "~> 0.4"},
       ...
 ```
 
@@ -121,7 +121,7 @@ More documentation is coming soon.
 
 ## License
 
-`speak_ex` is Copyright (c) 2015-2016 E-MetroTel
+`speak_ex` is Copyright (c) 2015-2017 E-MetroTel
 
 The source code is released under the MIT License.
 

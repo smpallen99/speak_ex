@@ -13,7 +13,7 @@ defmodule SpeakEx.OutboundCall do
     priority = get_setting(options, :priority, "1")
     exten = get_setting(options, :exten, @redirect_number)
     callback = get_setting(options, :callback, nil)
-    caller_pid_var = Keyword.get(options, :caller_pid, self) |> get_caller_pid_var
+    caller_pid_var = Keyword.get(options, :caller_pid, self()) |> get_caller_pid_var
 
     opts = Keyword.drop options, [:event_handler, :context, :priority, :exten, :callback, :caller_pid]
 

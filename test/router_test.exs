@@ -43,26 +43,26 @@ defmodule SpeakEx.RouterTest do
   def test_call_3, do: {:agicall, [{'agi_extension', '1235'}, {'agi_callerid', '444'}]}
 
   test "gets extension with list" do
-    assert SpeakEx.Utils.get_channel_variable(test_call, 'extension') == "5555"
+    assert SpeakEx.Utils.get_channel_variable(test_call(), 'extension') == "5555"
   end
   test "gets channel with string" do
-    assert SpeakEx.Utils.get_channel_variable(test_call, "channel") == "SIP/200-00000008"
+    assert SpeakEx.Utils.get_channel_variable(test_call(), "channel") == "SIP/200-00000008"
   end
   test "gets callerid with atom" do
-    assert SpeakEx.Utils.get_channel_variable(test_call, :callerid) == "200"
+    assert SpeakEx.Utils.get_channel_variable(test_call(), :callerid) == "200"
   end
 
   test "it finds a default route" do
-    call = test_call
+    call = test_call()
     assert SpeakEx.RouterTest.Router.do_router(call) == {:ok, call}
   end
 
   test "it finds route with from" do
-    call = test_call_2 
+    call = test_call_2() 
     assert SpeakEx.RouterTest.Router.do_router(call) == {:ok, {:router2, call}}
   end
   test "it finds route with to" do
-    call = test_call_3 
+    call = test_call_3()
     assert SpeakEx.RouterTest.Router.do_router(call) == {:ok, {:router3, call}}
   end
 

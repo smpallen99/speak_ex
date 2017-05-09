@@ -1,5 +1,5 @@
 %{"erlagi": {:git, "https://github.com/smpallen99/erlagi.git", "59ff096dfdb2acaf8a713bf6bdeaa3021d267b3f", []},
-  "ex_ami": {:hex, :ex_ami, "0.1.0", "7c59d3c8fbb2ba94bab81abc9cd687a69ef15d92b3284c088dc452e54561851c", [:mix], []},
-  "gen_fsm": {:git, "https://github.com/smpallen99/gen_fsm.git", "5497076f77b91789ae474ebc8a02d638b2209566", []},
-  "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "212299233c7e7eb63a97be2777e1c05ebaa58dbe", [tag: "0.1.8"]},
-  "lager": {:git, "git://github.com/basho/lager.git", "8187757388c9adc915379caaab36a2f2ca26e944", [ref: "master"]}}
+  "ex_ami": {:hex, :ex_ami, "0.2.0", "f60445b133b75b9db35f9ccfc16abbc5cea971c894114c54733c675c226cd18a", [:mix], [{:gen_fsm, "~> 0.1", [hex: :gen_fsm, optional: false]}]},
+  "gen_fsm": {:hex, :gen_fsm, "0.1.0", "5097308e244e25dbb2aa0ee5b736bb1ab79c3f8ca889a9e5b3aabd8beee6fc88", [:mix], []},
+  "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "64864ba7fcf40988361340e48680b49a2c2938cf", [tag: "0.1.7"]},
+  "lager": {:git, "git://github.com/basho/lager.git", "e82bb13efa32a0de747d7dc0e8c567794965cec2", [ref: "master"]}}

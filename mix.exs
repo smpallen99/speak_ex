@@ -4,10 +4,10 @@ defmodule SpeakEx.Mixfile do
   def project do
     [
       app: :speak_ex,
-      version: "0.3.0",
+      version: "0.4.0",
       elixir: "~> 1.3",
-      deps: deps,
-      package: package,
+      deps: deps(),
+      package: package(),
       name: "Coherence",
       description: """
       An Elixir framework for building telephony applications, inspired by Ruby's Adhearsion.
@@ -21,7 +21,9 @@ defmodule SpeakEx.Mixfile do
   defp deps do
     [
       {:erlagi, github: "smpallen99/erlagi"},
-      {:ex_ami, "~> 0.1"},
+      # {:gen_fsm, "~> 0.1"},
+      # {:gen_fsm, github: "smpallen99/gen_fsm"},
+      {:ex_ami, "~> 0.2"},
     ]
   end
 

@@ -17,7 +17,7 @@ defmodule SpeakEx.CallController do
     controller = Keyword.get(options, :controller, :run)
     Agent.start_link(fn -> 
       opts = Keyword.drop(options, [:controller_metadata, :controller])
-      |> Keyword.put(:caller_pid, self)
+      |> Keyword.put(:caller_pid, self())
       SpeakEx.OutboundCall.originate(to, opts)
       {{module, controller}, metadata} 
     end) 
