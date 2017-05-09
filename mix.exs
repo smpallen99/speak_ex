@@ -21,8 +21,6 @@ defmodule SpeakEx.Mixfile do
   defp deps do
     [
       {:erlagi, github: "smpallen99/erlagi"},
-      # {:gen_fsm, "~> 0.1"},
-      # {:gen_fsm, github: "smpallen99/gen_fsm"},
       {:ex_ami, "~> 0.2"},
     ]
   end
