@@ -8,22 +8,22 @@ defmodule SpeakEx.CallController do
     quote do
       import unquote(__MODULE__)
     end
-  end 
+  end
 
   def command(function, arguments), do: run_command(:erlagi, function, arguments)
 
   def originate(to, options \\ [], module) do
     metadata = Keyword.get(options, :controller_metadata, [])
     controller = Keyword.get(options, :controller, :run)
-    Agent.start_link(fn -> 
+    Agent.start_link(fn ->
       opts = Keyword.drop(options, [:controller_metadata, :controller])
       |> Keyword.put(:caller_pid, self())
       SpeakEx.OutboundCall.originate(to, opts)
-      {{module, controller}, metadata} 
-    end) 
+      {{module, controller}, metadata}
+    end)
   end
 
-  api :answer 
+  api :answer
   api :hangup
   api :terminate
   api :enable_music
@@ -66,7 +66,7 @@ defmodule SpeakEx.CallController do
     play(call, filename_or_list)
     call
   end
-  
+
   def speak(call, phrase, opts \\ []), do: Output.render(call, phrase, opts)
   def speak!(call, phrase, opts \\ []) do
     speak(call, phrase, opts)
@@ -80,30 +80,30 @@ defmodule SpeakEx.CallController do
   end
 
   def get_variable(call, variable) when is_binary(variable),
-    do: get_variable(call, String.to_char_list(variable))
+    do: get_variable(call, String.to_charlist(variable))
   def get_variable(call, variable) do
-    call 
+    call
     |> :erlagi_io.agi_rw('GET VARIABLE', [variable])
     |> :erlagi_result.get_variable()
   end
 
   #######################
-  # Callbacks 
+  # Callbacks
 
   def new_call(call) do
-    caller_pid = :erlagi.get_variable(call, 'caller_pid') 
-      
+    caller_pid = :erlagi.get_variable(call, 'caller_pid')
+
     unless caller_pid do
       Application.get_env(:speak_ex, :router)
       |> apply(:do_router, [call])
     else
-      agent = caller_pid |> :erlang.list_to_pid 
+      agent = caller_pid |> :erlang.list_to_pid
 
       case Agent.get(agent, &(&1)) do
         {{mod, fun}, metadata} ->
           Agent.stop(agent)
           apply(mod, fun, [call, metadata])
-        other -> 
+        other ->
           Logger.error "Failed to get from Agent. Result was #{inspect other}"
           {:error, "Agent failed. Result was #{inspect other}"}
       end

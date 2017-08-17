@@ -4,8 +4,8 @@ defmodule SpeakEx.Mixfile do
   def project do
     [
       app: :speak_ex,
-      version: "0.4.0",
-      elixir: "~> 1.3",
+      version: "0.5.0",
+      elixir: "~> 1.4",
       deps: deps(),
       package: package(),
       name: "Coherence",
@@ -21,7 +21,7 @@ defmodule SpeakEx.Mixfile do
   defp deps do
     [
       {:erlagi, github: "smpallen99/erlagi"},
-      {:ex_ami, "~> 0.2"},
+      {:ex_ami, "~> 0.3"},
     ]
   end
 

@@ -37,19 +37,19 @@ defmodule SpeakEx.Output do
       separator = if acc == "", do: "", else: Swift.ssml[:break][:sentence]
       acc <> separator <> "#{item}"
     end)
-    |> String.to_char_list
+    |> String.to_charlist
     swift_stream_file(call, text, timeout, digits, voice)
   end
   defp swift_stream_file(call, phrase, timeout, digits, voice) when is_binary(phrase),
-    do: swift_stream_file(call, String.to_char_list(phrase), timeout, digits, voice)
+    do: swift_stream_file(call, String.to_charlist(phrase), timeout, digits, voice)
   defp swift_stream_file(call, phrase, timeout, digits, voice) when is_binary(voice),
-    do: swift_stream_file(call, phrase, timeout, digits, String.to_char_list(voice))
+    do: swift_stream_file(call, phrase, timeout, digits, String.to_charlist(voice))
   defp swift_stream_file(call, phrase, timeout, digits, voice) when is_binary(digits),
-    do: swift_stream_file(call, phrase, timeout, String.to_char_list(digits), voice)
+    do: swift_stream_file(call, phrase, timeout, String.to_charlist(digits), voice)
   defp swift_stream_file(call, phrase, timeout, digits, voice) do
     append = unless is_nil(digits) do
       timeout = if timeout, do: timeout, else: 2000
-      String.to_char_list "|#{timeout}|#{digits}"
+      String.to_charlist "|#{timeout}|#{digits}"
     else
       ''
     end

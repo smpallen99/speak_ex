@@ -1,5 +1,7 @@
 %{"erlagi": {:git, "https://github.com/smpallen99/erlagi.git", "59ff096dfdb2acaf8a713bf6bdeaa3021d267b3f", []},
-  "ex_ami": {:hex, :ex_ami, "0.2.0", "f60445b133b75b9db35f9ccfc16abbc5cea971c894114c54733c675c226cd18a", [:mix], [{:gen_fsm, "~> 0.1", [hex: :gen_fsm, optional: false]}]},
+  "ex_ami": {:hex, :ex_ami, "0.3.0", "e8666e9d9954effd48e2e95e9f1a6975a91259948b13eaf66d7882d8d86ba3f2", [:mix], [{:gen_state_machine, "~> 2.0", [hex: :gen_state_machine, repo: "hexpm", optional: false]}, {:gen_state_machine_helpers, "~> 0.1", [hex: :gen_state_machine_helpers, repo: "hexpm", optional: false]}], "hexpm"},
   "gen_fsm": {:hex, :gen_fsm, "0.1.0", "5097308e244e25dbb2aa0ee5b736bb1ab79c3f8ca889a9e5b3aabd8beee6fc88", [:mix], []},
+  "gen_state_machine": {:hex, :gen_state_machine, "2.0.0", "f3bc7d961e4cd9f37944b379137e25fd063feffc42800bed69197fd1b78b3151", [], [], "hexpm"},
+  "gen_state_machine_helpers": {:hex, :gen_state_machine_helpers, "0.1.0", "d6cd29d6b0a5ffeacd6e6d007733231916c228f2a0f758ff93d5361656a22133", [], [], "hexpm"},
   "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "64864ba7fcf40988361340e48680b49a2c2938cf", [tag: "0.1.7"]},
   "lager": {:git, "git://github.com/basho/lager.git", "e82bb13efa32a0de747d7dc0e8c567794965cec2", [ref: "master"]}}
