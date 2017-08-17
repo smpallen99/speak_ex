@@ -4,7 +4,7 @@ defmodule SpeakEx.CallController.Macros do
     quote do
       import unquote(__MODULE__)
     end
-  end 
+  end
 
   @doc """
   Creates API functions.
@@ -24,15 +24,21 @@ defmodule SpeakEx.CallController.Macros do
     end
 
   """
-  defmacro api(name), do: _api(name, name)
-  defmacro api(name, command_name), do: _api(name, command_name)
+  defmacro api(name), do: do_api(name, name)
+  defmacro api(name, command_name), do: do_api(name, command_name)
 
-  defp _api(name, command_name) do
+  defp do_api(name, command_name) do
     fun2 = String.to_atom("#{name}!")
     quote do
-      def unquote(name)(call), do: command(unquote(command_name), [call])
-      def unquote(name)(call, opts) when is_list(opts), do: command(unquote(command_name), [call] ++ opts)
-      def unquote(name)(call, arg), do: command(unquote(command_name), [call] ++ [arg])
+      def unquote(name)(call),
+        do: command(unquote(command_name), [call])
+
+      def unquote(name)(call, opts) when is_list(opts),
+        do: command(unquote(command_name), [call] ++ opts)
+
+      def unquote(name)(call, arg),
+        do: command(unquote(command_name), [call] ++ [arg])
+
       def unquote(fun2)(call, opts \\ []) do
         unquote(name)(call, opts)
         call

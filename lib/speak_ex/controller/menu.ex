@@ -1,5 +1,4 @@
 defmodule SpeakEx.CallController.Menu do
-
   @moduledoc """
   Defines a voice menu.
 
@@ -12,22 +11,21 @@ defmodule SpeakEx.CallController.Menu do
         invalid fn(press) -> say "is invalid" end
         timeout fn -> say "times up, try again" end
       end
-  
+
   """
-  import SpeakEx.Utils
-  alias SpeakEx.AgiResult
+  import SpeakEx.{Utils, CallController, Output}
+
+  alias SpeakEx.{CallController.Menu, AgiResult}
+
   require Logger
-  import SpeakEx.CallController
-  import SpeakEx.Output
-  alias SpeakEx.CallController.Menu
-  
+
   defmacro __using__(_options) do
     quote do
       alias SpeakEx.CallController.Menu
-      import unquote(__MODULE__), only: [menu: 4, match: 2, timeout: 1, 
-        default: 1, invalid: 1, failure: 1] 
+      import unquote(__MODULE__), only: [menu: 4, match: 2, timeout: 1,
+        default: 1, invalid: 1, failure: 1]
     end
-  end 
+  end
 
   defmacro menu(call, prompt, options \\ [], do: block) do
     quote do
@@ -40,7 +38,7 @@ defmodule SpeakEx.CallController.Menu do
       Menu.do_menu(unquote(call), unquote(prompt), unquote(options), commands, 1)
     end
   end
-  
+
   defmacro match(value, fun) do
     quote do
       var!(__matches) = var!(__matches) ++ [{unquote(value), unquote(fun)}]
@@ -73,16 +71,16 @@ defmodule SpeakEx.CallController.Menu do
 
   @doc false
   def do_menu(call, prompt, options, commands, count) do
-    tries  = Keyword.get(options, :tries, 0) 
+    tries  = Keyword.get(options, :tries, 0)
     try do
       timeout = Keyword.get(options, :timeout, '-1')
-      |> any_to_char_list
+      |> any_to_charlist
 
       get_response(call, prompt, timeout)
-      |> handle_timeout(call, prompt, options, commands, count, tries) 
-      |> handle_matches(call, prompt, options, commands, count, tries) 
-    rescue 
-      all -> 
+      |> handle_timeout(call, prompt, options, commands, count, tries)
+      |> handle_matches(call, prompt, options, commands, count, tries)
+    rescue
+      all ->
         Logger.error "Exception: #{inspect all}"
         commands[:failure]
         |> handle_callback(:failure, :ok)
@@ -92,13 +90,13 @@ defmodule SpeakEx.CallController.Menu do
 
   defp get_response(call, prompt, timeout) do
     case render(call, prompt, num_digits: 1, digits: '#*1234567890', timeout: timeout) do
-      %AgiResult{timeout: true} -> 
+      %AgiResult{timeout: true} ->
         # The user has let the prompt play to completion
         case run_command(:erlagi, :wait_digit, [call, timeout]) do
           %AgiResult{timeout: false, data: data} -> data
           %AgiResult{timeout: true} -> :timeout
         end
-      %AgiResult{data: data} -> 
+      %AgiResult{data: data} ->
         # The user has interrupted the playback
         data
     end
@@ -107,7 +105,7 @@ defmodule SpeakEx.CallController.Menu do
   defp handle_timeout(:timeout, call, prompt, options, commands, count, tries) do
     fun = commands[:timeout]
     if fun, do: fun.()
-    unless check_and_handle_failure(call, tries, count, commands), 
+    unless check_and_handle_failure(call, tries, count, commands),
       do: do_menu(call, prompt, options, commands, count + 1)
     :timeout
   end
@@ -120,11 +118,11 @@ defmodule SpeakEx.CallController.Menu do
   end
   defp handle_matches(press, call, prompt, options, commands, count, tries) do
     case Enum.find commands[:matches], &(press_valid?(&1, press)) do
-      nil -> 
+      nil ->
         commands[:invalid]
-        |> handle_callback(press, :invalid) 
+        |> handle_callback(press, :invalid)
         |> handle_call_back_response(call, prompt, options, commands, count, tries)
-      {_value, fun} -> 
+      {_value, fun} ->
         fun
         |> handle_callback(press, :ok)
         |> handle_call_back_response(call, prompt, options, commands, count, tries)
@@ -149,15 +147,15 @@ defmodule SpeakEx.CallController.Menu do
 
   defp handle_call_back_response(resp, call, prompt, options, commands, count, tries) do
     case resp do
-      :invalid -> 
-        unless check_and_handle_failure(call, tries, count, commands) do 
+      :invalid ->
+        unless check_and_handle_failure(call, tries, count, commands) do
           Menu.do_menu(call, prompt, options, commands, count + 1)
-        else 
+        else
           :ok
         end
-      :repeat -> 
+      :repeat ->
         do_menu(call, prompt, options, commands, count)
-      other -> 
+      other ->
         other
     end
   end

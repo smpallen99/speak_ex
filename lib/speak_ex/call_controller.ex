@@ -1,8 +1,10 @@
 defmodule SpeakEx.CallController do
-  require Logger
+  use SpeakEx.CallController.Macros
+
   alias SpeakEx.AgiResult
   alias SpeakEx.Output
-  use SpeakEx.CallController.Macros
+
+  require Logger
 
   defmacro __using__(_options) do
     quote do
@@ -10,15 +12,21 @@ defmodule SpeakEx.CallController do
     end
   end
 
-  def command(function, arguments), do: run_command(:erlagi, function, arguments)
+  def command(function, arguments),
+    do: run_command(:erlagi, function, arguments)
 
   def originate(to, options \\ [], module) do
     metadata = Keyword.get(options, :controller_metadata, [])
     controller = Keyword.get(options, :controller, :run)
+
     Agent.start_link(fn ->
-      opts = Keyword.drop(options, [:controller_metadata, :controller])
-      |> Keyword.put(:caller_pid, self())
+      opts =
+        options
+        |> Keyword.drop([:controller_metadata, :controller])
+        |> Keyword.put(:caller_pid, self())
+
       SpeakEx.OutboundCall.originate(to, opts)
+
       {{module, controller}, metadata}
     end)
   end
@@ -59,19 +67,25 @@ defmodule SpeakEx.CallController do
   def play(call, [h | _] = filenames) when is_list(h) do
     stream_file(call, filenames ++ ['#'])
   end
+
   def play(call, filename) do
     stream_file(call, [filename, '#'])
   end
+
   def play!(call, filename_or_list) do
     play(call, filename_or_list)
     call
   end
 
-  def speak(call, phrase, opts \\ []), do: Output.render(call, phrase, opts)
+  def speak(call, phrase, opts \\ []) do
+    Output.render(call, phrase, opts)
+  end
+
   def speak!(call, phrase, opts \\ []) do
     speak(call, phrase, opts)
     call
   end
+
   def say(call, phrase, opts \\ []), do: speak(call, phrase, opts)
   def say!(call, phrase, opts \\ []), do: speak!(call, phrase, opts)
 
@@ -79,8 +93,10 @@ defmodule SpeakEx.CallController do
     exec(call, ['SWIFT', [phrase]])
   end
 
-  def get_variable(call, variable) when is_binary(variable),
-    do: get_variable(call, String.to_charlist(variable))
+  def get_variable(call, variable) when is_binary(variable) do
+    get_variable(call, String.to_charlist(variable))
+  end
+
   def get_variable(call, variable) do
     call
     |> :erlagi_io.agi_rw('GET VARIABLE', [variable])
@@ -93,11 +109,12 @@ defmodule SpeakEx.CallController do
   def new_call(call) do
     caller_pid = :erlagi.get_variable(call, 'caller_pid')
 
-    unless caller_pid do
-      Application.get_env(:speak_ex, :router)
+    if not !!caller_pid do
+      :speak_ex
+      |> Application.get_env(:router)
       |> apply(:do_router, [call])
     else
-      agent = caller_pid |> :erlang.list_to_pid
+      agent = :erlang.list_to_pid caller_pid
 
       case Agent.get(agent, &(&1)) do
         {{mod, fun}, metadata} ->
